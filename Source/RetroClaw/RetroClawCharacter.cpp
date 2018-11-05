@@ -84,9 +84,24 @@ void ARetroClawCharacter::UpdateAnimation()
 	const FVector PlayerVelocity = GetVelocity();
 	const float PlayerSpeedSqr = PlayerVelocity.SizeSquared();
 
+	UPaperFlipbook* DesiredAnimation;
+
+	if (GetCharacterMovement()->IsFalling()) {
+		// if falling then render falling animation.
+		// UE_LOG(LogTemp, Warning, TEXT("Text"));
+		DesiredAnimation = JumpingAnimation;
+	}
+	else if (isSwording) {
+		// if swording then render the sword animation.
+		DesiredAnimation = SwordingAnimation;
+	}
+	else {
+		// else render running or idle animation
+		DesiredAnimation = (PlayerSpeedSqr > 0.0f) ? RunningAnimation : IdleAnimation;
+	}
+
 	// Are we moving or standing still?
-	UPaperFlipbook* DesiredAnimation = (PlayerSpeedSqr > 0.0f) ? RunningAnimation : IdleAnimation;
-	if( GetSprite()->GetFlipbook() != DesiredAnimation 	)
+	if( GetSprite()->GetFlipbook() != DesiredAnimation )
 	{
 		GetSprite()->SetFlipbook(DesiredAnimation);
 	}
@@ -96,7 +111,14 @@ void ARetroClawCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
-	UpdateCharacter();	
+	if (isSwording) {
+		UE_LOG(LogTemp, Warning, TEXT("swording"));
+	} 
+	else { 
+		UE_LOG(LogTemp, Warning, TEXT("not swording")); 
+	}
+
+	UpdateCharacter();
 }
 
 
@@ -109,6 +131,7 @@ void ARetroClawCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARetroClawCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Sword", IE_Pressed, this, &ARetroClawCharacter::StartSwording);
 
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ARetroClawCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &ARetroClawCharacter::TouchStopped);
@@ -120,6 +143,24 @@ void ARetroClawCharacter::MoveRight(float Value)
 
 	// Apply the input to the character motion
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
+}
+
+// starts the timer for the swording animation
+void ARetroClawCharacter::StartSwording()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("swording"));
+	isSwording = true;
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopSwording, 0.63f, false);
+
+	//GetCharacterMovement()->StopMovementImmediately();
+}
+
+// called when the timer for the swording animation ends
+void ARetroClawCharacter::StopSwording()
+{
+	isSwording = false;
 }
 
 void ARetroClawCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
