@@ -39,7 +39,7 @@ AEnemyCharacter::AEnemyCharacter()
 	bReplicates = true;
 
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
-	StartMovementTimer();
+	//StartMovementTimer();
 }
 
 //////////////////////////////////////////////////////////////////////////

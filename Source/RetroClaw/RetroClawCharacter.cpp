@@ -112,10 +112,10 @@ void ARetroClawCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	
 	if (isSwording) {
-		//UE_LOG(LogTemp, Warning, TEXT("swording"));
+		UE_LOG(LogTemp, Warning, TEXT("swording"));
 	} 
 	else { 
-		//UE_LOG(LogTemp, Warning, TEXT("not swording")); 
+		UE_LOG(LogTemp, Warning, TEXT("not swording")); 
 	}
 
 	UpdateCharacter();
