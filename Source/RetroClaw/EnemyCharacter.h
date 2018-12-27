@@ -15,6 +15,7 @@ class RETROCLAW_API AEnemyCharacter : public APaperCharacter
 	GENERATED_BODY()
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay();
 
 protected:
 	// The animation to play while idle (standing still)

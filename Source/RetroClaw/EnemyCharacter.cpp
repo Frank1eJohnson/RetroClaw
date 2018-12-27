@@ -39,7 +39,6 @@ AEnemyCharacter::AEnemyCharacter()
 	bReplicates = true;
 
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
-	//StartMovementTimer();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,6 +67,16 @@ void AEnemyCharacter::UpdateAnimation()
 	}
 }
 
+void AEnemyCharacter::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("beginplay"));
+
+	//StartMovementTimer();
+}
+
 void AEnemyCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -78,6 +87,7 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 	else {
 		//UE_LOG(LogTemp, Warning, TEXT("not swording"));
 	}
+	UE_LOG(LogTemp, Warning, TEXT("%f"), DeltaSeconds);
 
 	AddMovementInput(FVector(movementDirection, 0.0f, 0.0f), 1);
 	
