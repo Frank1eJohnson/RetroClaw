@@ -36,8 +36,8 @@ protected:
 	void UpdateCharacter();
 
 	void StartMovementTimer();
-
 	void ChangeMovementDirection();
+	void StartIdlenessTimer();
 
 	bool isSwording = false;
 

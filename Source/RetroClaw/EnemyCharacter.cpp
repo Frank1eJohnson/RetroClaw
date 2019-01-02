@@ -74,7 +74,7 @@ void AEnemyCharacter::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("beginplay"));
 
-	//StartMovementTimer();
+	StartMovementTimer();
 }
 
 void AEnemyCharacter::Tick(float DeltaSeconds)
@@ -96,8 +96,10 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 
 void AEnemyCharacter::StartMovementTimer()
 {
+	UE_LOG(LogTemp, Error, TEXT("started timer"));
+
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::ChangeMovementDirection, 1.63f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::ChangeMovementDirection, 1.2f, false);
 }
 
 void AEnemyCharacter::ChangeMovementDirection()
@@ -107,7 +109,17 @@ void AEnemyCharacter::ChangeMovementDirection()
 	else if (movementDirection == -1.0f)
 		movementDirection = 1.0f;
 
-	StartMovementTimer();
+	UE_LOG(LogTemp, Error, TEXT("ended timer"));
+	StartIdlenessTimer();
+}
+
+void AEnemyCharacter::StartIdlenessTimer()
+{
+	UE_LOG(LogTemp, Error, TEXT("started idleness timer"));
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StartMovementTimer, 0.5f, false);
+	//StartMovementTimer();
 }
 
 void AEnemyCharacter::UpdateCharacter()
