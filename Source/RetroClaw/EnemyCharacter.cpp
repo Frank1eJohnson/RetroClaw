@@ -74,6 +74,7 @@ void AEnemyCharacter::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("beginplay"));
 
+	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
 	StartMovementTimer();
 }
 
@@ -108,8 +109,26 @@ void AEnemyCharacter::ChangeMovementDirection()
 		movementDirection = -1.0f;
 	else if (movementDirection == -1.0f)
 		movementDirection = 1.0f;
-
+	
 	UE_LOG(LogTemp, Error, TEXT("ended timer"));
+
+
+	if (movementDirection < 0.0f)
+	{
+		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+		// compensate for sword space in sprite
+		SetActorLocation(GetActorLocation() + FVector(-130.0f, 0.0f, 0.0f)); 
+	}
+	else if (movementDirection > 0.0f)
+	{
+		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+		// compensate for sword space in sprite
+		SetActorLocation(GetActorLocation() + FVector(130.0f, 0.0f, 0.0f));
+	}
+	
+
+	//SetActorLocation(GetActorLocation() + FVector(-1.0f * movementDirection * 80.0f, 0.0f, 0.0f)); 
+
 	StartIdlenessTimer();
 }
 
@@ -128,18 +147,22 @@ void AEnemyCharacter::UpdateCharacter()
 	UpdateAnimation();
 
 	// Now setup the rotation of the controller based on the direction we are travelling
-	const FVector PlayerVelocity = GetVelocity();
-	float TravelDirection = PlayerVelocity.X;
-	// Set the rotation so that the character faces his direction of travel.
-	if (Controller != nullptr)
-	{
-		if (TravelDirection < 0.0f)
-		{
-			Controller->SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
-		}
-		else if (TravelDirection > 0.0f)
-		{
-			Controller->SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
-		}
-	}
+	//const FVector PlayerVelocity = GetVelocity();
+	//float TravelDirection = PlayerVelocity.X;
+	//// Set the rotation so that the character faces his direction of travel.
+	//if (Controller != nullptr)
+	//{
+	//	if (TravelDirection < 0.0f)
+	//	{
+	//		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
+	//		//SetActorLocation(GetActorLocation() + FVector(80.0f, 0.0f, 0.0f));
+	//		//Controller->SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
+	//	}
+	//	else if (TravelDirection > 0.0f)
+	//	{
+	//		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
+	//		//SetActorLocation(GetActorLocation() + FVector(-80.0f, 0.0f, 0.0f));
+	//		//Controller->SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
+	//	}
+	//}
 }
