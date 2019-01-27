@@ -20,9 +20,9 @@ AEnemyCharacter::AEnemyCharacter()
 	GetCharacterMovement()->AirControl = 0.80f;
 	GetCharacterMovement()->JumpZVelocity = 1000.f;
 	GetCharacterMovement()->GroundFriction = 3.0f;
-	GetCharacterMovement()->MaxWalkSpeed = 150.0f;
-	GetCharacterMovement()->MaxFlySpeed = 150.0f;
-
+	GetCharacterMovement()->MaxWalkSpeed = 100.0f;
+	GetCharacterMovement()->MaxFlySpeed = 100.0f;
+	
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 	// Lock character motion onto the XZ plane, so the character can't move in or out of the screen
@@ -100,7 +100,7 @@ void AEnemyCharacter::StartMovementTimer()
 	UE_LOG(LogTemp, Error, TEXT("started timer"));
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::ChangeMovementDirection, 1.2f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::ChangeMovementDirection, 2.2f, false);
 }
 
 void AEnemyCharacter::ChangeMovementDirection()
