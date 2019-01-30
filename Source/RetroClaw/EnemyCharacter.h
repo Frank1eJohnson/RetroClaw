@@ -39,6 +39,9 @@ protected:
 	void ChangeMovementDirection();
 	void StartIdlenessTimer();
 
+	void StartSwording();
+	void StopSwording();
+
 	bool isSwording = false;
 
 	// movementDirection will be multiplied by world vector
@@ -47,8 +50,18 @@ protected:
 	float movementDirection = 1.0f;
 
 public:
-
 	AEnemyCharacter();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* attackCollisionBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AActor* ClawCharacter;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+						
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 };

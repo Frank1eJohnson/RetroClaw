@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"  
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h" 
+#include "Components/BoxComponent.h"
+#include "Engine/Engine.h"
 
 
 AEnemyCharacter::AEnemyCharacter() 
@@ -39,6 +41,32 @@ AEnemyCharacter::AEnemyCharacter()
 	bReplicates = true;
 
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
+
+	attackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
+	attackCollisionBox->SetBoxExtent(FVector(32.0f, 32.0f, 32.0f));
+	attackCollisionBox->SetCollisionProfileName("Trigger");
+	attackCollisionBox->SetupAttachment(RootComponent);
+
+	attackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapBegin);
+	attackCollisionBox->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapEnd);
+}
+
+
+void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("begin overlap"));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "overlap Begin");
+	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
+		StartSwording();
+	}
+}
+
+void AEnemyCharacter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("end overlap"));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "overlap End");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -88,16 +116,54 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 	else {
 		//UE_LOG(LogTemp, Warning, TEXT("not swording"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%f"), DeltaSeconds);
+	//UE_LOG(LogTemp, Warning, TEXT("%f"), DeltaSeconds);
 
 	AddMovementInput(FVector(movementDirection, 0.0f, 0.0f), 1);
+
+	//if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("overlapping"));
+	//	isSwording = true;
+	//}
+	//else {
+	//	isSwording = false;
+	//}
 	
 	UpdateCharacter();
 }
 
+
+// starts the timer for the swording animation
+void AEnemyCharacter::StartSwording()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("swording"));
+	isSwording = true;
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopSwording, 0.8f, false);
+
+	GetCharacterMovement()->DisableMovement();
+	//GetCharacterMovement()->StopMovementImmediately();
+}
+
+// called when the timer for the swording animation ends
+void AEnemyCharacter::StopSwording()
+{
+	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
+		StartSwording();
+	} else {
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		isSwording = false;
+	}
+	
+}
+
+
 void AEnemyCharacter::StartMovementTimer()
 {
-	UE_LOG(LogTemp, Error, TEXT("started timer"));
+	//UE_LOG(LogTemp, Error, TEXT("started timer"));
 
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::ChangeMovementDirection, 2.2f, false);
@@ -105,12 +171,18 @@ void AEnemyCharacter::StartMovementTimer()
 
 void AEnemyCharacter::ChangeMovementDirection()
 {
+	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	{
+		StartMovementTimer();
+		return;
+	}
+
 	if (movementDirection == 1.0f)
 		movementDirection = -1.0f;
 	else if (movementDirection == -1.0f)
 		movementDirection = 1.0f;
 	
-	UE_LOG(LogTemp, Error, TEXT("ended timer"));
+	//UE_LOG(LogTemp, Error, TEXT("ended timer"));
 
 
 	if (movementDirection < 0.0f)
@@ -134,7 +206,7 @@ void AEnemyCharacter::ChangeMovementDirection()
 
 void AEnemyCharacter::StartIdlenessTimer()
 {
-	UE_LOG(LogTemp, Error, TEXT("started idleness timer"));
+	//UE_LOG(LogTemp, Error, TEXT("started idleness timer"));
 
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StartMovementTimer, 0.5f, false);
