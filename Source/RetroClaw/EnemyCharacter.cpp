@@ -42,6 +42,8 @@ AEnemyCharacter::AEnemyCharacter()
 
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
 
+
+	// initializes the enemy's box collision 
 	attackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
 	attackCollisionBox->SetBoxExtent(FVector(32.0f, 32.0f, 32.0f));
 	attackCollisionBox->SetCollisionProfileName("Trigger");
@@ -52,6 +54,7 @@ AEnemyCharacter::AEnemyCharacter()
 }
 
 
+// will be called when the Claw character enter the collision box
 void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("begin overlap"));
@@ -63,6 +66,8 @@ void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	}
 }
 
+// will supposedly be called when the Claw character exit the collision box
+// it's not being called at the moment
 void AEnemyCharacter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("end overlap"));
@@ -118,6 +123,8 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), DeltaSeconds);
 
+	// the movementDirection will routinly be changed from 1 to -1
+	// so the enemy will always be moving either to left or to right
 	AddMovementInput(FVector(movementDirection, 0.0f, 0.0f), 1);
 
 	//if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
@@ -139,8 +146,11 @@ void AEnemyCharacter::StartSwording()
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
 	isSwording = true;
 
+	// swording animation takes 0.6 second
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopSwording, 0.8f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopSwording, 0.6f, false);
+
+	StartDamaging();
 
 	GetCharacterMovement()->DisableMovement();
 	//GetCharacterMovement()->StopMovementImmediately();
@@ -149,6 +159,7 @@ void AEnemyCharacter::StartSwording()
 // called when the timer for the swording animation ends
 void AEnemyCharacter::StopSwording()
 {
+	StopDamaging();
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
@@ -157,8 +168,28 @@ void AEnemyCharacter::StopSwording()
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		isSwording = false;
 	}
-	
 }
+
+// somehow this method gets called twice for a single hit.
+void AEnemyCharacter::StartDamaging()
+{
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopDamaging, 0.5f, false);
+}
+
+void AEnemyCharacter::StopDamaging()
+{
+	// checks if enemy is overlapping claw
+	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("hit"));
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, "hitted claw"); 
+	}
+	else {
+		//UE_LOG(LogTemp, Warning, TEXT("else"));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "didn't hit claw");
+	}
+} 
 
 
 void AEnemyCharacter::StartMovementTimer()
@@ -204,6 +235,8 @@ void AEnemyCharacter::ChangeMovementDirection()
 	StartIdlenessTimer();
 }
 
+// don't know why but unreal enters crashloop without this 
+// function, so here it is.
 void AEnemyCharacter::StartIdlenessTimer()
 {
 	//UE_LOG(LogTemp, Error, TEXT("started idleness timer"));
@@ -217,24 +250,4 @@ void AEnemyCharacter::UpdateCharacter()
 {
 	// Update animation to match the motion
 	UpdateAnimation();
-
-	// Now setup the rotation of the controller based on the direction we are travelling
-	//const FVector PlayerVelocity = GetVelocity();
-	//float TravelDirection = PlayerVelocity.X;
-	//// Set the rotation so that the character faces his direction of travel.
-	//if (Controller != nullptr)
-	//{
-	//	if (TravelDirection < 0.0f)
-	//	{
-	//		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
-	//		//SetActorLocation(GetActorLocation() + FVector(80.0f, 0.0f, 0.0f));
-	//		//Controller->SetControlRotation(FRotator(0.0, 180.0f, 0.0f));
-	//	}
-	//	else if (TravelDirection > 0.0f)
-	//	{
-	//		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
-	//		//SetActorLocation(GetActorLocation() + FVector(-80.0f, 0.0f, 0.0f));
-	//		//Controller->SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
-	//	}
-	//}
 }

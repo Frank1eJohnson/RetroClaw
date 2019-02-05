@@ -42,6 +42,9 @@ protected:
 	void StartSwording();
 	void StopSwording();
 
+	void StartDamaging();
+	void StopDamaging(); 
+
 	bool isSwording = false;
 
 	// movementDirection will be multiplied by world vector
