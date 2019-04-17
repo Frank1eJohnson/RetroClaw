@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
+#include "HealthComponent.h"
 #include "EnemyCharacter.generated.h"
 
 /**
@@ -30,6 +31,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* SwordingAnimation;
 
+	// The animation to play after death
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* DeadAnimation;
+
 	/** Called to choose the correct animation to play based on the character's movement state */
 	void UpdateAnimation();
 
@@ -43,9 +48,10 @@ protected:
 	void StopSwording();
 
 	void StartDamaging();
-	void StopDamaging(); 
+	void StopDamaging();
 
 	bool isSwording = false;
+	bool isDead = false;
 
 	// movementDirection will be multiplied by world vector
 	// 0 will result in no movement, 1 is right
@@ -53,18 +59,26 @@ protected:
 	float movementDirection = 1.0f;
 
 public:
-	AEnemyCharacter();
+	AEnemyCharacter(); 
+
+	class AActor* ClawCharacter; 
+
+	UPROPERTY(EditDefaultsOnly, Category = Damage)
+	TSubclassOf<UDamageType> DamageType;
+
+	UHealthComponent* EnemyHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UBoxComponent* attackCollisionBox;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AActor* ClawCharacter;
-
+private:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-						
+	
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
+	void HandleDeath();
+
+	void DestroyEnemy();
 };

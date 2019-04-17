@@ -8,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "EnemyCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(SideScrollerCharacter, Log, All);
@@ -71,10 +73,22 @@ ARetroClawCharacter::ARetroClawCharacter()
     // 	TextComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
     // 	TextComponent->SetupAttachment(RootComponent);
 
+	ClawHealth = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	// initializes the enemy's box collision 
+	attackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
+	attackCollisionBox->SetBoxExtent(FVector(32.0f, 32.0f, 32.0f));
+	attackCollisionBox->SetCollisionProfileName("Trigger");
+	attackCollisionBox->SetupAttachment(RootComponent); 
+
+	BulletSpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Bullet Spawn Point"));
+	BulletSpawnLocation->SetupAttachment(RootComponent);
+
 	// Enable replication on the Sprite component so animations show up when networked
 	GetSprite()->SetIsReplicated(true);
 	bReplicates = true;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Animation
@@ -86,7 +100,13 @@ void ARetroClawCharacter::UpdateAnimation()
 
 	UPaperFlipbook* DesiredAnimation;
 
-	if (GetCharacterMovement()->IsFalling()) {
+	if (isDead) {
+		DesiredAnimation = DeadAnimation;
+	}
+	else if (isHurt) {
+		DesiredAnimation = HurtAnimation;
+	}
+	else if (GetCharacterMovement()->IsFalling()) {
 		// if falling then render falling animation.
 		// UE_LOG(LogTemp, Warning, TEXT("Text"));
 		DesiredAnimation = JumpingAnimation;
@@ -111,11 +131,8 @@ void ARetroClawCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
-	if (isSwording) {
-		//UE_LOG(LogTemp, Warning, TEXT("swording"));
-	} 
-	else { 
-		//UE_LOG(LogTemp, Warning, TEXT("not swording")); 
+	if (!isDead && ClawHealth->GetHealth() <= 0) {
+		HandleDeath();
 	}
 
 	UpdateCharacter();
@@ -148,19 +165,86 @@ void ARetroClawCharacter::MoveRight(float Value)
 // starts the timer for the swording animation
 void ARetroClawCharacter::StartSwording()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("swording"));
-	isSwording = true;
+	if (isSwording == false && GetCharacterMovement()->IsFalling() == false)
+	{
+		isSwording = true;
 
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopSwording, 0.63f, false);
+		if (GetActorRotation().Yaw >= 0)
+		{
+			//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(43.0f, 0.0f, 0.0f));
+		}
+		else 
+		{
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-43.0f, 0.0f, 0.0f));
+		}
+		
+		StartDamaging();
 
-	//GetCharacterMovement()->StopMovementImmediately();
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopSwording, 0.6f, false);
+
+		//GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+	}
 }
 
 // called when the timer for the swording animation ends
 void ARetroClawCharacter::StopSwording()
 {
 	isSwording = false;
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	if (GetActorRotation().Yaw >= 0)
+	{
+		//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
+		GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-43.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(43.0f, 0.0f, 0.0f));
+	}
+}
+
+// somehow this method gets called twice for a single hit.
+void ARetroClawCharacter::StartDamaging()
+{
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopDamaging, 0.3f, false);
+}
+
+void ARetroClawCharacter::StopDamaging()
+{
+	TSet<AActor*> OverlappingActors;
+
+	attackCollisionBox->GetOverlappingActors(OverlappingActors);
+	for (auto& Actor : OverlappingActors)
+	{
+		if (Actor->IsA(AEnemyCharacter::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1"));
+
+			UGameplayStatics::ApplyDamage(Actor, 300, GetOwner()->GetInstigatorController(), this, DamageType);
+
+			break;
+		}
+	}
+}
+
+
+// start hurt and stop hurt are implemented but not used yet. I realised it would 
+// require either a major refactor of the entire project or very nasty code to use them.
+void ARetroClawCharacter::StartHurt()
+{
+	isHurt = true;
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopHurt, 0.1f, false);
+}
+
+void ARetroClawCharacter::StopHurt()
+{
+	isHurt = false;
 }
 
 void ARetroClawCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -195,4 +279,15 @@ void ARetroClawCharacter::UpdateCharacter()
 			Controller->SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
 		}
 	}
+}
+
+void ARetroClawCharacter::HandleDeath()
+{
+	isDead = true;
+
+	GetCharacterMovement()->DisableMovement(); 
+	FVector ClawLocation = GetActorLocation();
+
+	//TODO: Disable Claw movement and make him fall 
+	//SetActorLocation(ClawLocation + FVector(0.0f, 1.0f, 0.0f));
 }

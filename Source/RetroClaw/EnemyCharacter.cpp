@@ -7,6 +7,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h" 
 #include "Components/BoxComponent.h"
+#include "RetroClawCharacter.h"
+#include "Kismet/GameplayStatics.h"	
+#include "Components/CapsuleComponent.h"
 #include "Engine/Engine.h"
 
 
@@ -42,6 +45,7 @@ AEnemyCharacter::AEnemyCharacter()
 
 	//UE_LOG(LogTemp, Warning, TEXT("swording"));
 
+	EnemyHealth = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	// initializes the enemy's box collision 
 	attackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
@@ -59,15 +63,22 @@ void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 {
 	//UE_LOG(LogTemp, Warning, TEXT("begin overlap"));
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "overlap Begin");
-	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	if (OtherActor && OtherComp->IsA(UCapsuleComponent::StaticClass()) && !isDead)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
-		StartSwording();
+		UE_LOG(LogTemp, Warning, TEXT("overlapping"));
+		
+		AActor* MyOwner = GetOwner();
+		if (OtherActor && OtherActor != this && OtherActor->IsA(ARetroClawCharacter::StaticClass()))
+		{
+			ClawCharacter = OtherActor;
+			StartSwording();
+		}
+		
 	}
 }
 
 // will supposedly be called when the Claw character exit the collision box
-// it's not being called at the moment
+// it's not being called at the moment, maybe an off signature dunno
 void AEnemyCharacter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("end overlap"));
@@ -84,7 +95,10 @@ void AEnemyCharacter::UpdateAnimation()
 
 	UPaperFlipbook* DesiredAnimation;
 
-	if (isSwording) {
+	if (isDead) {
+		DesiredAnimation = DeadAnimation;
+	}
+	else if (isSwording) {
 		// if swording then render the sword animation.
 		DesiredAnimation = SwordingAnimation;
 	}
@@ -120,21 +134,22 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 	}
 	else {
 		//UE_LOG(LogTemp, Warning, TEXT("not swording"));
-	}
-	//UE_LOG(LogTemp, Warning, TEXT("%f"), DeltaSeconds);
+	} 
 
 	// the movementDirection will routinly be changed from 1 to -1
 	// so the enemy will always be moving either to left or to right
-	AddMovementInput(FVector(movementDirection, 0.0f, 0.0f), 1);
+	if (isDead)
+	{ 
+		AddMovementInput(FVector(-1.0f, 0.0f, 0.0f), 1);
+	}
+	else 
+	{
+		AddMovementInput(FVector(movementDirection, 0.0f, 0.0f), 1);
+	}
 
-	//if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("overlapping"));
-	//	isSwording = true;
-	//}
-	//else {
-	//	isSwording = false;
-	//}
+	if (!isDead && EnemyHealth->GetHealth() <= 0) {
+		HandleDeath();
+	}
 	
 	UpdateCharacter();
 }
@@ -159,7 +174,7 @@ void AEnemyCharacter::StartSwording()
 // called when the timer for the swording animation ends
 void AEnemyCharacter::StopSwording()
 {
-	StopDamaging();
+	//StopDamaging();
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
@@ -182,8 +197,10 @@ void AEnemyCharacter::StopDamaging()
 	// checks if enemy is overlapping claw
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("hit"));
+		//UE_LOG(LogTemp, Warning, TEXT("hit"));
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, "hitted claw"); 
+
+		UGameplayStatics::ApplyDamage(ClawCharacter, 20, GetOwner()->GetInstigatorController(), this, DamageType);
 	}
 	else {
 		//UE_LOG(LogTemp, Warning, TEXT("else"));
@@ -202,6 +219,11 @@ void AEnemyCharacter::StartMovementTimer()
 
 void AEnemyCharacter::ChangeMovementDirection()
 {
+	if (isDead)
+	{
+		return;
+	}
+
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
 	{
 		StartMovementTimer();
@@ -218,15 +240,11 @@ void AEnemyCharacter::ChangeMovementDirection()
 
 	if (movementDirection < 0.0f)
 	{
-		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
-		// compensate for sword space in sprite
-		SetActorLocation(GetActorLocation() + FVector(-130.0f, 0.0f, 0.0f)); 
+		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f)); 
 	}
 	else if (movementDirection > 0.0f)
 	{
-		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
-		// compensate for sword space in sprite
-		SetActorLocation(GetActorLocation() + FVector(130.0f, 0.0f, 0.0f));
+		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f)); 
 	}
 	
 
@@ -250,4 +268,24 @@ void AEnemyCharacter::UpdateCharacter()
 {
 	// Update animation to match the motion
 	UpdateAnimation();
+}
+
+void AEnemyCharacter::HandleDeath()
+{
+	isDead = true;
+
+	//GetCharacterMovement()->DisableMovement(); 
+
+	//TODO: Disable Enemy movement and make him fall  
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::DestroyEnemy, 0.6f, false);
+
+	//SetActorLocation(GetActorLocation() + FVector(0.0f, 4.0f, 0.0f));
+	this->SetActorEnableCollision(false);
+}
+
+void AEnemyCharacter::DestroyEnemy()
+{
+	this->Destroy();
 }
