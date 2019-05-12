@@ -81,9 +81,6 @@ ARetroClawCharacter::ARetroClawCharacter()
 	attackCollisionBox->SetCollisionProfileName("Trigger");
 	attackCollisionBox->SetupAttachment(RootComponent); 
 
-	BulletSpawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Bullet Spawn Point"));
-	BulletSpawnLocation->SetupAttachment(RootComponent);
-
 	// Enable replication on the Sprite component so animations show up when networked
 	GetSprite()->SetIsReplicated(true);
 	bReplicates = true;

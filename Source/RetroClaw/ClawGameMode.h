@@ -17,17 +17,13 @@ class RETROCLAW_API AClawGameMode : public AGameModeBase
 
 private:
 
-	int64 PlayerScore = 0;
-
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
+
 
 public:
 
 	void ActorDied(AActor* DeadActor);
-
-	void AddScore(int64 AdditionlaScore);
-	int64 GetScore();
 
 protected:
 
