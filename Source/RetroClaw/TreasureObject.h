@@ -6,15 +6,19 @@
 #include "PaperFlipbookActor.h"
 #include "TreasureObject.generated.h"
 
-
-class AClawGameMode;
-
+/**
+ * 
+ */
 UCLASS()
 class RETROCLAW_API ATreasureObject : public APaperFlipbookActor
 {
 	GENERATED_BODY()
 	
 	virtual void BeginPlay();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* BaseAnimation;
 
 public:
 	ATreasureObject();
@@ -27,10 +31,5 @@ private:
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* ScoreCollisionBox;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	int64 TreasureObjectScore;
-
-	AClawGameMode* GameModeRef;
+	class UBoxComponent* attackCollisionBox;
 };
