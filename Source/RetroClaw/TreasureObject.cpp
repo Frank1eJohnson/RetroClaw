@@ -3,11 +3,10 @@
 
 #include "TreasureObject.h"
 #include "PaperFlipbookComponent.h" 
-#include "Components/CapsuleComponent.h"  
 #include "Components/BoxComponent.h"
 #include "RetroClawCharacter.h"
 #include "Kismet/GameplayStatics.h"	
-#include "Components/CapsuleComponent.h"
+#include "Components/CapsuleComponent.h" 
 #include "Engine/Engine.h"
 
 ATreasureObject::ATreasureObject()

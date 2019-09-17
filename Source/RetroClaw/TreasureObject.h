@@ -17,8 +17,7 @@ class RETROCLAW_API ATreasureObject : public APaperFlipbookActor
 	virtual void BeginPlay();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
-	class UPaperFlipbook* BaseAnimation;
+
 
 public:
 	ATreasureObject();
