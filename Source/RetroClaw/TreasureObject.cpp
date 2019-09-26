@@ -12,22 +12,24 @@
 ATreasureObject::ATreasureObject()
 {
 	// initializes the enemy's box collision 
-	attackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollision"));
-	attackCollisionBox->SetBoxExtent(FVector(32.0f, 32.0f, 32.0f));
-	attackCollisionBox->SetCollisionProfileName("Trigger");
-	attackCollisionBox->SetupAttachment(RootComponent);
+	ScoreCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("ScoreCollision"));
+	ScoreCollisionBox->SetBoxExtent(FVector(7.0f, 7.0f, 7.0f));
+	ScoreCollisionBox->SetCollisionProfileName("Trigger");
+	ScoreCollisionBox->SetupAttachment(RootComponent);
 
-	attackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ATreasureObject::OnOverlapBegin);
-	attackCollisionBox->OnComponentEndOverlap.AddDynamic(this, &ATreasureObject::OnOverlapEnd);
+	ScoreCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ATreasureObject::OnOverlapBegin);
+	ScoreCollisionBox->OnComponentEndOverlap.AddDynamic(this, &ATreasureObject::OnOverlapEnd);
 }
 
 void ATreasureObject::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("started treasure"));
+	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
+	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
 }
 
 void ATreasureObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
 }
 
 void ATreasureObject::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

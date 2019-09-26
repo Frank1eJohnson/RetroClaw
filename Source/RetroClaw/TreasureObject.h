@@ -16,9 +16,6 @@ class RETROCLAW_API ATreasureObject : public APaperFlipbookActor
 	
 	virtual void BeginPlay();
 
-protected:
-
-
 public:
 	ATreasureObject();
 
@@ -30,5 +27,8 @@ private:
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* attackCollisionBox;
+	class UBoxComponent* ScoreCollisionBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int64 score;
 };
