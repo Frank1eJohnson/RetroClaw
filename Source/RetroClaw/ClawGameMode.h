@@ -27,6 +27,7 @@ public:
 	void ActorDied(AActor* DeadActor);
 
 	void AddScore(int64 AdditionlaScore);
+	int64 GetScore();
 
 protected:
 

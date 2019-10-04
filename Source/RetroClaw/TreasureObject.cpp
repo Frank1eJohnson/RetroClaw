@@ -7,6 +7,7 @@
 #include "RetroClawCharacter.h"
 #include "Kismet/GameplayStatics.h"	
 #include "Components/CapsuleComponent.h" 
+#include "ClawGameMode.h"
 #include "Engine/Engine.h"
 
 ATreasureObject::ATreasureObject()
@@ -23,15 +24,25 @@ ATreasureObject::ATreasureObject()
 
 void ATreasureObject::BeginPlay()
 {
+	Super::BeginPlay();
+
+	GameModeRef = Cast<AClawGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
 	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
 	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
 }
 
 void ATreasureObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("started treasure system"));
+	// increase the score in the game mode.
+	GameModeRef->AddScore(TreasureObjectScore);
+
+	// TODO: create animation for the score object flying to the score.
+
+	// destroy actor.
+
 }
 
 void ATreasureObject::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-}
+} 

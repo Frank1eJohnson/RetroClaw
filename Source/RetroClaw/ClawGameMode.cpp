@@ -16,9 +16,17 @@ void AClawGameMode::ActorDied(AActor* DeadActor)
 	UE_LOG(LogTemp, Warning, TEXT("Actor Died"));
 }
 
+
 void AClawGameMode::AddScore(int64 AdditionlaScore)
 {
 	PlayerScore += AdditionlaScore;
+	UE_LOG(LogTemp, Warning, TEXT("score is: %i"), PlayerScore);
+}
+
+
+int64 AClawGameMode::GetScore()
+{
+	return PlayerScore;
 }
 
 

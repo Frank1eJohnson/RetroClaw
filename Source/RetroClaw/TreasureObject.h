@@ -6,9 +6,9 @@
 #include "PaperFlipbookActor.h"
 #include "TreasureObject.generated.h"
 
-/**
- * 
- */
+
+class AClawGameMode;
+
 UCLASS()
 class RETROCLAW_API ATreasureObject : public APaperFlipbookActor
 {
@@ -30,5 +30,7 @@ private:
 	class UBoxComponent* ScoreCollisionBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	int64 score;
+	int64 TreasureObjectScore;
+
+	AClawGameMode* GameModeRef;
 };
