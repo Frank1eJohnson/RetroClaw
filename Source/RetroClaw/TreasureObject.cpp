@@ -34,13 +34,17 @@ void ATreasureObject::BeginPlay()
 
 void ATreasureObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// increase the score in the game mode.
-	GameModeRef->AddScore(TreasureObjectScore);
+	// check it it's claw who's overlapping with the score object.
+	if (OtherActor && OtherActor->IsA(ARetroClawCharacter::StaticClass()) && OtherComp->IsA(UCapsuleComponent::StaticClass()))
+	{
+		// increase the score in the game mode.
+		GameModeRef->AddScore(TreasureObjectScore);
 
-	// TODO: create animation for the score object flying to the score.
+		// TODO: create animation for the score object flying to the score.
 
-	// destroy actor.
-
+		// destroy actor.
+		this->Destroy();
+	} 
 }
 
 void ATreasureObject::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
