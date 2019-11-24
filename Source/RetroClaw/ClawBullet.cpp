@@ -8,12 +8,18 @@
 #include "EnemyCharacter.h"
 #include "Kismet/GameplayStatics.h"	
 #include "Components/CapsuleComponent.h" 
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "ClawGameMode.h"
 #include "Engine/Engine.h"
 
 AClawBullet::AClawBullet()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	ProjectileMovement->InitialSpeed = MovementSpeed;
+	ProjectileMovement->MaxSpeed = MovementSpeed;
+	InitialLifeSpan = 3.0f;
 
 	// initializes the Bullet's box collision 
 	HitCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Bullet Collision"));

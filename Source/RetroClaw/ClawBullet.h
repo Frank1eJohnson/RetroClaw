@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "ClawBullet.generated.h"
 
 
@@ -15,7 +16,10 @@ class RETROCLAW_API AClawBullet : public APaperSpriteActor
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(EditAnywhere, Category = Damage, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditAnywhere, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float MovementSpeed = 1300;
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage, meta = (AllowPrivateAccess = "true"))
