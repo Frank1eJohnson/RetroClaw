@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
 #include "HealthComponent.h"
+#include "ClawBullet.h"
 #include "Components/BoxComponent.h"
 #include "RetroClawCharacter.generated.h"
 
@@ -36,6 +37,9 @@ class ARetroClawCharacter : public APaperCharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BulletSpawnLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+	AClawBullet* BulletRef;
 
 protected:
 	// The animation to play while running around
@@ -73,6 +77,9 @@ protected:
 
 	void StartDamaging();
 	void StopDamaging();
+
+	void StartPistoling();
+	void StopPistoling();
 
 	void StartHurt();
 	void StopHurt();

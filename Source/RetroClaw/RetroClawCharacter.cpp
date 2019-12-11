@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnemyCharacter.h"
+#include "ClawBullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
 
@@ -149,6 +150,7 @@ void ARetroClawCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARetroClawCharacter::MoveRight);
 	PlayerInputComponent->BindAction("Sword", IE_Pressed, this, &ARetroClawCharacter::StartSwording);
+	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &ARetroClawCharacter::StartPistoling);
 
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ARetroClawCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &ARetroClawCharacter::TouchStopped);
@@ -229,6 +231,19 @@ void ARetroClawCharacter::StopDamaging()
 			break;
 		}
 	}
+}
+
+void ARetroClawCharacter::StartPistoling()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
+	if (BulletRef)
+	{
+
+	}
+}
+
+void ARetroClawCharacter::StopPistoling()
+{
 }
 
 
