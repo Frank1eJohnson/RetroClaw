@@ -7,6 +7,7 @@
 #include "HealthComponent.h"
 #include "ClawBullet.h"
 #include "Components/BoxComponent.h"
+#include "PaperSpriteActor.h"
 #include "RetroClawCharacter.generated.h"
 
 class UTextRenderComponent;
@@ -35,12 +36,12 @@ class ARetroClawCharacter : public APaperCharacter
 	UTextRenderComponent* TextComponent;
 	virtual void Tick(float DeltaSeconds) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BulletSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	AClawBullet* BulletRef;
-
+	TSubclassOf<APaperSpriteActor> BulletClass;
+	
 protected:
 	// The animation to play while running around
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
