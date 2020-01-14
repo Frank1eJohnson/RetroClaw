@@ -37,9 +37,7 @@ void AClawBullet::BeginPlay()
 
 	GameModeRef = Cast<AClawGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	
-
-	UE_LOG(LogTemp, Warning, TEXT("started bullet"));
+	//UE_LOG(LogTemp, Warning, TEXT("started bullet"));
 }
 
 void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -48,13 +46,18 @@ void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	if (OtherActor && OtherActor->IsA(AEnemyCharacter::StaticClass()) && OtherComp->IsA(UCapsuleComponent::StaticClass()))
 	{
 		// the bullet has hitted an enemy 
+		//UE_LOG(LogTemp, Warning, TEXT("hitted enemy"));
 
 		// decrease the enemy health.
-		//UGameplayStatics::ApplyDamage(OtherActor, Damage, GetOwner()->GetInstigatorController(), this, DamageType);
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, DamageType);
 
-		// destroy actor.
-		//this->Destroy();
+		// destroy the bullet.
+		this->Destroy();
 	}
+	//else if (OtherActor && OtherActor->IsA(AClawBullet::StaticClass()))
+	//{
+	//	this->Destroy();
+	//}
 }
 
 void AClawBullet::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

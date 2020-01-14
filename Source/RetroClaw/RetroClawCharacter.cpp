@@ -244,8 +244,7 @@ void ARetroClawCharacter::StartPistoling()
 		if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f); 
 		else SpawnLocation = GetActorLocation() + FVector(-70.0, 0.0f, 25.0f);
 
-		AClawBullet* TempBullet = GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
-		TempBullet->SetOwner(this);
+		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
 }
 
