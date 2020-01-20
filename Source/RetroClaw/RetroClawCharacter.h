@@ -59,6 +59,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* SwordingAnimation;
 
+	// The animation to play while firing the pistol
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* PistolingAnimation;
+
 	// The animation to play while getting hurt
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* HurtAnimation;
@@ -101,6 +105,7 @@ protected:
 	bool isHurt = false;
 	bool isDead = false;
 	bool isSwording = false; 
+	bool isPistoling = false; 
 
 public:
 	ARetroClawCharacter();

@@ -48,5 +48,5 @@ protected:
 	// called when actor is spawned
 	virtual void BeginPlay() override;
 
-	
+
 };

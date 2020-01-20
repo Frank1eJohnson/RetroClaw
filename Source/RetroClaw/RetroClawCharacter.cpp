@@ -116,6 +116,9 @@ void ARetroClawCharacter::UpdateAnimation()
 		// if swording then render the sword animation.
 		DesiredAnimation = SwordingAnimation;
 	}
+	else if (isPistoling) {
+		DesiredAnimation = PistolingAnimation;
+	}
 	else {
 		// else render running or idle animation
 		DesiredAnimation = (PlayerSpeedSqr > 0.0f) ? RunningAnimation : IdleAnimation;
@@ -235,21 +238,27 @@ void ARetroClawCharacter::StopDamaging()
 
 void ARetroClawCharacter::StartPistoling()
 {
+	isPistoling = true;
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.3f, false);
+}
+
+void ARetroClawCharacter::StopPistoling()
+{
 	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
 	if (BulletClass)
 	{
 		FRotator SpawnRotation = GetActorRotation();
 		FVector SpawnLocation;
 
-		if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f); 
+		if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f);
 		else SpawnLocation = GetActorLocation() + FVector(-70.0, 0.0f, 25.0f);
 
 		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
-}
 
-void ARetroClawCharacter::StopPistoling()
-{
+	isPistoling = false;
 }
 
 

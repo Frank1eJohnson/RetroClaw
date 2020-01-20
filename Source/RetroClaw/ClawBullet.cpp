@@ -18,8 +18,9 @@ AClawBullet::AClawBullet()
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->InitialSpeed = MovementSpeed;
-	ProjectileMovement->MaxSpeed = MovementSpeed;
-	InitialLifeSpan = 3.0f;
+	ProjectileMovement->MaxSpeed = MovementSpeed; 
+
+	InitialLifeSpan = 2.0f;
 
 	// initializes the Bullet's box collision 
 	HitCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Bullet Collision"));
@@ -54,12 +55,9 @@ void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 		// destroy the bullet.
 		this->Destroy();
 	}
-	//else if (OtherActor && OtherActor->IsA(AClawBullet::StaticClass()))
-	//{
-	//	this->Destroy();
-	//}
 }
 
 void AClawBullet::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 }
+ 
