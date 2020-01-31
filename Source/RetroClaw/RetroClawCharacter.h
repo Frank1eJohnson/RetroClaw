@@ -41,6 +41,8 @@ class ARetroClawCharacter : public APaperCharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<APaperSpriteActor> BulletClass;
+
+	void FixAnimationChangeOffset(float offset, bool animationBegin);
 	
 protected:
 	// The animation to play while running around

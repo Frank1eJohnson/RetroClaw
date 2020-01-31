@@ -109,7 +109,6 @@ void ARetroClawCharacter::UpdateAnimation()
 	}
 	else if (GetCharacterMovement()->IsFalling()) {
 		// if falling then render falling animation.
-		// UE_LOG(LogTemp, Warning, TEXT("Text"));
 		DesiredAnimation = JumpingAnimation;
 	}
 	else if (isSwording) {
@@ -174,15 +173,7 @@ void ARetroClawCharacter::StartSwording()
 	{
 		isSwording = true;
 
-		if (GetActorRotation().Yaw >= 0)
-		{
-			//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
-			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(43.0f, 0.0f, 0.0f));
-		}
-		else 
-		{
-			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-43.0f, 0.0f, 0.0f));
-		}
+		FixAnimationChangeOffset(43.0, true);
 		
 		StartDamaging();
 
@@ -200,15 +191,7 @@ void ARetroClawCharacter::StopSwording()
 	isSwording = false;
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
-	if (GetActorRotation().Yaw >= 0)
-	{
-		//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
-		GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-43.0f, 0.0f, 0.0f));
-	}
-	else
-	{
-		GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(43.0f, 0.0f, 0.0f));
-	}
+	FixAnimationChangeOffset(43.0, false);
 }
 
 // somehow this method gets called twice for a single hit.
@@ -240,6 +223,8 @@ void ARetroClawCharacter::StartPistoling()
 {
 	isPistoling = true;
 
+	FixAnimationChangeOffset(43.0, true);
+
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.3f, false);
 }
@@ -257,6 +242,8 @@ void ARetroClawCharacter::StopPistoling()
 
 		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
+
+	FixAnimationChangeOffset(43.0, false);
 
 	isPistoling = false;
 }
@@ -307,6 +294,34 @@ void ARetroClawCharacter::UpdateCharacter()
 		else if (TravelDirection > 0.0f)
 		{
 			Controller->SetControlRotation(FRotator(0.0f, 0.0f, 0.0f));
+		}
+	}
+}
+
+void ARetroClawCharacter::FixAnimationChangeOffset(float offset, bool animationBegin)
+{
+	if (animationBegin)
+	{
+		if (GetActorRotation().Yaw >= 0)
+		{
+			//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(offset, 0.0f, 0.0f));
+		}
+		else
+		{
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-offset, 0.0f, 0.0f));
+		}
+	}
+	else
+	{
+		if (GetActorRotation().Yaw >= 0)
+		{
+			//SetActorLocation(GetActorLocation() + FVector(10.0f, 0.0f, 0.0f));
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(-offset, 0.0f, 0.0f));
+		}
+		else
+		{
+			GetSprite()->SetWorldLocation(GetSprite()->GetComponentLocation() + FVector(offset, 0.0f, 0.0f));
 		}
 	}
 }
