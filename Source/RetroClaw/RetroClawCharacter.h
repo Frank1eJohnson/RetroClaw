@@ -86,6 +86,7 @@ protected:
 	void StopDamaging();
 
 	void StartPistoling();
+	void SpawnBullet();
 	void StopPistoling();
 
 	void StartHurt();

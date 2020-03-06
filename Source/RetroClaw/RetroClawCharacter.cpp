@@ -68,12 +68,6 @@ ARetroClawCharacter::ARetroClawCharacter()
 	// behavior on the edge of a ledge versus inclines by setting this to true or false
 	GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
 
-    // 	TextComponent = CreateDefaultSubobject<UTextRenderComponent>(TEXT("IncarGear"));
-    // 	TextComponent->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
-    // 	TextComponent->SetRelativeLocation(FVector(35.0f, 5.0f, 20.0f));
-    // 	TextComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
-    // 	TextComponent->SetupAttachment(RootComponent);
-
 	ClawHealth = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	// initializes the enemy's box collision 
@@ -226,10 +220,10 @@ void ARetroClawCharacter::StartPistoling()
 	FixAnimationChangeOffset(43.0, true);
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.3f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.3f, false);
 }
 
-void ARetroClawCharacter::StopPistoling()
+void ARetroClawCharacter::SpawnBullet()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
 	if (BulletClass)
@@ -243,8 +237,13 @@ void ARetroClawCharacter::StopPistoling()
 		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
 
-	FixAnimationChangeOffset(43.0, false);
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.45f, false);
+}
 
+void ARetroClawCharacter::StopPistoling()
+{
+	FixAnimationChangeOffset(43.0, false);
 	isPistoling = false;
 }
 
