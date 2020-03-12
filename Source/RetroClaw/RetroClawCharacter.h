@@ -46,7 +46,7 @@ class ARetroClawCharacter : public APaperCharacter
 	
 protected:
 	// The animation to play while running around
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Animations)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* RunningAnimation;
 
 	// The animation to play while idle (standing still)
@@ -80,10 +80,8 @@ protected:
 	void MoveRight(float Value);
 
 	void StartSwording();
+	void DealDamage();
 	void StopSwording();
-
-	void StartDamaging();
-	void StopDamaging();
 
 	void StartPistoling();
 	void SpawnBullet();
@@ -109,6 +107,8 @@ protected:
 	bool isDead = false;
 	bool isSwording = false; 
 	bool isPistoling = false; 
+
+	float currentHealth = 100.0f;
 
 public:
 	ARetroClawCharacter();

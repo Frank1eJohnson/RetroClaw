@@ -37,8 +37,6 @@ void AClawBullet::BeginPlay()
 	Super::BeginPlay();
 
 	GameModeRef = Cast<AClawGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-	//UE_LOG(LogTemp, Warning, TEXT("started bullet"));
 }
 
 void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -132,6 +132,12 @@ void ARetroClawCharacter::Tick(float DeltaSeconds)
 		HandleDeath();
 	}
 
+	if (currentHealth != ClawHealth->GetHealth()) {
+		StartHurt();
+
+		currentHealth = ClawHealth->GetHealth();
+	}
+
 	UpdateCharacter();
 }
 
@@ -167,35 +173,17 @@ void ARetroClawCharacter::StartSwording()
 	{
 		isSwording = true;
 
-		FixAnimationChangeOffset(43.0, true);
-		
-		StartDamaging();
+		FixAnimationChangeOffset(43.0, true); 
 
 		FTimerHandle UnusedHandle;
-		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopSwording, 0.6f, false);
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::DealDamage, 0.3f, false);
 
 		//GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->DisableMovement();
 	}
 }
 
-// called when the timer for the swording animation ends
-void ARetroClawCharacter::StopSwording()
-{
-	isSwording = false;
-	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-
-	FixAnimationChangeOffset(43.0, false);
-}
-
-// somehow this method gets called twice for a single hit.
-void ARetroClawCharacter::StartDamaging()
-{
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopDamaging, 0.3f, false);
-}
-
-void ARetroClawCharacter::StopDamaging()
+void ARetroClawCharacter::DealDamage()
 {
 	TSet<AActor*> OverlappingActors;
 
@@ -211,16 +199,34 @@ void ARetroClawCharacter::StopDamaging()
 			break;
 		}
 	}
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopSwording, 0.3f, false);
 }
+
+// called when the timer for the swording animation ends
+void ARetroClawCharacter::StopSwording()
+{
+	isSwording = false;
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	FixAnimationChangeOffset(43.0, false);
+}
+
 
 void ARetroClawCharacter::StartPistoling()
 {
-	isPistoling = true;
+	if (isPistoling == false && GetCharacterMovement()->IsFalling() == false)
+	{
+		isPistoling = true;
 
-	FixAnimationChangeOffset(43.0, true);
+		FixAnimationChangeOffset(43.0, true);
 
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.3f, false);
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.3f, false);
+
+		GetCharacterMovement()->DisableMovement();
+	}
 }
 
 void ARetroClawCharacter::SpawnBullet()
@@ -243,24 +249,27 @@ void ARetroClawCharacter::SpawnBullet()
 
 void ARetroClawCharacter::StopPistoling()
 {
-	FixAnimationChangeOffset(43.0, false);
 	isPistoling = false;
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	FixAnimationChangeOffset(43.0, false);
 }
 
 
 // start hurt and stop hurt are implemented but not used yet. I realised it would 
-// require either a major refactor of the entire project or very nasty code to use them.
 void ARetroClawCharacter::StartHurt()
 {
 	isHurt = true;
+	GetCharacterMovement()->DisableMovement();
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopHurt, 0.1f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopHurt, 0.2f, false);
 }
 
 void ARetroClawCharacter::StopHurt()
 {
 	isHurt = false;
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 void ARetroClawCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
