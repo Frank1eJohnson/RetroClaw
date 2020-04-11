@@ -61,9 +61,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* SwordingAnimation;
 
+	// The animation to play while swording mid air
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* JumpSwordingAnimation;
+
 	// The animation to play while firing the pistol
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* PistolingAnimation;
+
+	// The animation to play while firing the pistol mid air
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* JumpPistolingAnimation;
 
 	// The animation to play while getting hurt
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)

@@ -101,16 +101,29 @@ void ARetroClawCharacter::UpdateAnimation()
 	else if (isHurt) {
 		DesiredAnimation = HurtAnimation;
 	}
+	else if (isSwording) {
+		// using the sword mid air
+		if (GetCharacterMovement()->IsFalling()) {
+			DesiredAnimation = JumpSwordingAnimation;
+		}
+		// using the sword on the ground
+		else {
+			DesiredAnimation = SwordingAnimation;
+		}
+	}
+	else if (isPistoling) {
+		// firing the pistol mid air
+		if (GetCharacterMovement()->IsFalling()) {
+			DesiredAnimation = JumpPistolingAnimation;
+		}
+		// firing the pistol on the ground
+		else {
+			DesiredAnimation = PistolingAnimation;
+		}
+	}
 	else if (GetCharacterMovement()->IsFalling()) {
 		// if falling then render falling animation.
 		DesiredAnimation = JumpingAnimation;
-	}
-	else if (isSwording) {
-		// if swording then render the sword animation.
-		DesiredAnimation = SwordingAnimation;
-	}
-	else if (isPistoling) {
-		DesiredAnimation = PistolingAnimation;
 	}
 	else {
 		// else render running or idle animation
@@ -216,16 +229,28 @@ void ARetroClawCharacter::StopSwording()
 
 void ARetroClawCharacter::StartPistoling()
 {
-	if (isPistoling == false && GetCharacterMovement()->IsFalling() == false)
+	if (isPistoling == false)
 	{
 		isPistoling = true;
 
-		FixAnimationChangeOffset(43.0, true);
+		// firing the pistol on the ground
+		if (GetCharacterMovement()->IsFalling() == false)
+		{
+			FixAnimationChangeOffset(43.0, true);
 
-		FTimerHandle UnusedHandle;
-		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.3f, false);
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.3f, false);
 
-		GetCharacterMovement()->DisableMovement();
+			GetCharacterMovement()->DisableMovement();
+		}
+		// firing the pistol mid air
+		else 
+		{
+			FixAnimationChangeOffset(43.0, true);
+
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::SpawnBullet, 0.2f, false);
+		}
 	}
 }
 
@@ -240,11 +265,22 @@ void ARetroClawCharacter::SpawnBullet()
 		if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f);
 		else SpawnLocation = GetActorLocation() + FVector(-70.0, 0.0f, 25.0f);
 
+		if (GetCharacterMovement()->IsFalling() == true) {
+			SpawnLocation += FVector(0.0, 0.0f, -20.0f);
+		}
+
 		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
 
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.45f, false);
+	if (GetCharacterMovement()->IsFalling()) {
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.3f, false);
+	}
+	else {
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(UnusedHandle, this, &ARetroClawCharacter::StopPistoling, 0.45f, false);
+	}
+	
 }
 
 void ARetroClawCharacter::StopPistoling()
