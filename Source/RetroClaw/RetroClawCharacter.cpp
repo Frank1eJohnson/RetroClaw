@@ -106,6 +106,10 @@ void ARetroClawCharacter::UpdateAnimation()
 		if (GetCharacterMovement()->IsFalling()) {
 			DesiredAnimation = JumpSwordingAnimation;
 		}
+		// using the sword while crouching
+		else if (isCrouching) {
+			DesiredAnimation = CrouchSwordingAnimation;
+		}
 		// using the sword on the ground
 		else {
 			DesiredAnimation = SwordingAnimation;
@@ -116,6 +120,10 @@ void ARetroClawCharacter::UpdateAnimation()
 		if (GetCharacterMovement()->IsFalling()) {
 			DesiredAnimation = JumpPistolingAnimation;
 		}
+		// firing the pistol while crouching
+		else if (isCrouching) {
+			DesiredAnimation = CrouchPistolingAnimation;
+		}
 		// firing the pistol on the ground
 		else {
 			DesiredAnimation = PistolingAnimation;
@@ -124,6 +132,9 @@ void ARetroClawCharacter::UpdateAnimation()
 	else if (GetCharacterMovement()->IsFalling()) {
 		// if falling then render falling animation.
 		DesiredAnimation = JumpingAnimation;
+	}
+	else if (isCrouching) {
+		DesiredAnimation = CrouchingAnimation;
 	}
 	else {
 		// else render running or idle animation
@@ -164,6 +175,8 @@ void ARetroClawCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARetroClawCharacter::MoveRight);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ARetroClawCharacter::Crouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ARetroClawCharacter::StopCrouching);
 	PlayerInputComponent->BindAction("Sword", IE_Pressed, this, &ARetroClawCharacter::StartSwording);
 	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &ARetroClawCharacter::StartPistoling);
 
@@ -179,14 +192,35 @@ void ARetroClawCharacter::MoveRight(float Value)
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 }
 
+void ARetroClawCharacter::Crouch()
+{
+	if (GetCharacterMovement()->IsFalling() == false)
+	{
+		isCrouching = true;
+		GetCharacterMovement()->DisableMovement();
+
+		FixAnimationChangeOffset(43.0, true);
+	}
+}
+
+void ARetroClawCharacter::StopCrouching()
+{
+	if (isCrouching == true)
+	{
+		isCrouching = false;
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+		FixAnimationChangeOffset(43.0, false);
+	}
+}
+
 // starts the timer for the swording animation
 void ARetroClawCharacter::StartSwording()
 {
-	if (isSwording == false)
+	if (isSwording == false && isCrouching == false)
 	{
 		isSwording = true;
 
-		// using the sword on the ground
 		if (GetCharacterMovement()->IsFalling() == false)
 		{
 			FixAnimationChangeOffset(43.0, true);
@@ -241,7 +275,7 @@ void ARetroClawCharacter::StopSwording()
 
 void ARetroClawCharacter::StartPistoling()
 {
-	if (isPistoling == false)
+	if (isPistoling == false && isCrouching == false)
 	{
 		isPistoling = true;
 

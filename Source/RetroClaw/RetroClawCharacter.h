@@ -57,6 +57,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* JumpingAnimation;
 
+	// The animation to play while crouching
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* CrouchingAnimation;
+
 	// The animation to play while swording
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* SwordingAnimation;
@@ -65,6 +69,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* JumpSwordingAnimation;
 
+	// The animation to play while swording in a crouch
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* CrouchSwordingAnimation;
+
 	// The animation to play while firing the pistol
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* PistolingAnimation;
@@ -72,6 +80,10 @@ protected:
 	// The animation to play while firing the pistol mid air
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UPaperFlipbook* JumpPistolingAnimation;
+	
+	// The animation to play while firing the pistol in a crouch
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UPaperFlipbook* CrouchPistolingAnimation;
 
 	// The animation to play while getting hurt
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
@@ -86,6 +98,10 @@ protected:
 
 	/** Called for side to side input */
 	void MoveRight(float Value);
+
+	/** Called for crouching input */
+	void Crouch();
+	void StopCrouching();
 
 	void StartSwording();
 	void DealDamage();
@@ -110,9 +126,10 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
-
+	
 	bool isHurt = false;
 	bool isDead = false;
+	bool isCrouching = false;
 	bool isSwording = false; 
 	bool isPistoling = false; 
 
