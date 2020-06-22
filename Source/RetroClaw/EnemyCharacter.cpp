@@ -54,7 +54,6 @@ AEnemyCharacter::AEnemyCharacter()
 	attackCollisionBox->SetupAttachment(RootComponent);
 
 	attackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapBegin);
-	attackCollisionBox->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnOverlapEnd);
 }
 
 
@@ -75,14 +74,6 @@ void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		}
 		
 	}
-}
-
-// will supposedly be called when the Claw character exit the collision box
-// it's not being called at the moment, maybe an off signature dunno
-void AEnemyCharacter::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	//UE_LOG(LogTemp, Warning, TEXT("end overlap"));
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "overlap End");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -128,13 +119,6 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (isSwording) {
-		//UE_LOG(LogTemp, Warning, TEXT("swording"));
-	}
-	else {
-		//UE_LOG(LogTemp, Warning, TEXT("not swording"));
-	} 
 
 	// the movementDirection will routinly be changed from 1 to -1
 	// so the enemy will always be moving either to left or to right
@@ -257,11 +241,8 @@ void AEnemyCharacter::ChangeMovementDirection()
 // function, so here it is.
 void AEnemyCharacter::StartIdlenessTimer()
 {
-	//UE_LOG(LogTemp, Error, TEXT("started idleness timer"));
-
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StartMovementTimer, 0.5f, false);
-	//StartMovementTimer();
 }
 
 void AEnemyCharacter::UpdateCharacter()
@@ -272,9 +253,7 @@ void AEnemyCharacter::UpdateCharacter()
 
 void AEnemyCharacter::HandleDeath()
 {
-	isDead = true;
-
-	//GetCharacterMovement()->DisableMovement(); 
+	isDead = true; 
 
 	//TODO: Disable Enemy movement and make him fall  
 
