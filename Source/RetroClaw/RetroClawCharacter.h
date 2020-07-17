@@ -100,7 +100,7 @@ protected:
 	void MoveRight(float Value);
 
 	/** Called for crouching input */
-	void Crouch();
+	void CrouchClaw();
 	void StopCrouching();
 
 	void StartSwording();

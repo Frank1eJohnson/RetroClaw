@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnemyCharacter.h"
+#include "BlueOfficer.h"
 #include "ClawBullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
@@ -175,7 +176,7 @@ void ARetroClawCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ARetroClawCharacter::MoveRight);
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ARetroClawCharacter::Crouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ARetroClawCharacter::CrouchClaw);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ARetroClawCharacter::StopCrouching);
 	PlayerInputComponent->BindAction("Sword", IE_Pressed, this, &ARetroClawCharacter::StartSwording);
 	PlayerInputComponent->BindAction("Pistol", IE_Pressed, this, &ARetroClawCharacter::StartPistoling);
@@ -192,7 +193,7 @@ void ARetroClawCharacter::MoveRight(float Value)
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), Value);
 }
 
-void ARetroClawCharacter::Crouch()
+void ARetroClawCharacter::CrouchClaw()
 {
 	if (GetCharacterMovement()->IsFalling() == false)
 	{
@@ -244,18 +245,18 @@ void ARetroClawCharacter::StartSwording()
 
 void ARetroClawCharacter::DealDamage()
 {
-	TSet<AActor*> OverlappingActors;
-
-	attackCollisionBox->GetOverlappingActors(OverlappingActors);
-	for (auto& Actor : OverlappingActors)
+	TSet<UPrimitiveComponent*> OverlappingComponents;
+	
+	attackCollisionBox->GetOverlappingComponents(OverlappingComponents);
+	
+	for (auto& Component : OverlappingComponents)
 	{
-		if (Actor->IsA(AEnemyCharacter::StaticClass()))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("1"));
-
-			UGameplayStatics::ApplyDamage(Actor, 300, GetOwner()->GetInstigatorController(), this, DamageType);
-
-			break;
+		if (Component->IsA(UCapsuleComponent::StaticClass()))
+		{ 
+			if (Component->GetOwner()->IsA(AEnemyCharacter::StaticClass()) || Component->GetOwner()->IsA(ABlueOfficer::StaticClass()))
+			{
+				UGameplayStatics::ApplyDamage(Component->GetOwner(), 300, GetOwner()->GetInstigatorController(), this, DamageType);
+			}
 		}
 	}
 

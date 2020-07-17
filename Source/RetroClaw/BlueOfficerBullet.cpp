@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ClawBullet.h"
+#include "BlueOfficerBullet.h"
 #include "PaperFlipbookComponent.h" 
 #include "Components/BoxComponent.h"
 #include "RetroClawCharacter.h"
@@ -13,13 +13,14 @@
 #include "BlueOfficer.h"
 #include "Engine/Engine.h"
 
-AClawBullet::AClawBullet()
+
+ABlueOfficerBullet::ABlueOfficerBullet()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->InitialSpeed = MovementSpeed;
-	ProjectileMovement->MaxSpeed = MovementSpeed; 
+	ProjectileMovement->MaxSpeed = MovementSpeed;
 
 	InitialLifeSpan = 2.0f;
 
@@ -29,21 +30,22 @@ AClawBullet::AClawBullet()
 	HitCollisionBox->SetCollisionProfileName("Trigger");
 	HitCollisionBox->SetupAttachment(RootComponent);
 
-	HitCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AClawBullet::OnOverlapBegin);
-	HitCollisionBox->OnComponentEndOverlap.AddDynamic(this, &AClawBullet::OnOverlapEnd);
+	HitCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ABlueOfficerBullet::OnOverlapBegin); 
 }
 
-void AClawBullet::BeginPlay()
+void ABlueOfficerBullet::BeginPlay()
 {
 	Super::BeginPlay();
+	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
 
 	GameModeRef = Cast<AClawGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
-void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABlueOfficerBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("overlapping"));
 	// check it it's claw who's overlapping with the score object.
-	if (OtherActor && (OtherActor->IsA(AEnemyCharacter::StaticClass()) || OtherActor->IsA(ABlueOfficer::StaticClass())) && OtherComp->IsA(UCapsuleComponent::StaticClass()))
+	if (OtherActor && OtherActor->IsA(ARetroClawCharacter::StaticClass()) && OtherComp->IsA(UCapsuleComponent::StaticClass()))
 	{
 		// decrease the enemy health.
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, DamageType);
@@ -53,7 +55,3 @@ void AClawBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void AClawBullet::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-}
- 

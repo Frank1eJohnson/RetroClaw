@@ -8,6 +8,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/BoxComponent.h"
 #include "RetroClawCharacter.h"
+#include "BlueOfficerBullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
 
@@ -216,7 +217,7 @@ void ABlueOfficer::FireBullet()
 		if (GetActorRotation().Yaw < 0) SpawnLocation = GetActorLocation() + FVector(65.0, 0.0f, 35.0f);
 		else SpawnLocation = GetActorLocation() + FVector(-65.0, 0.0f, 35.0f);
 
-		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
+		GetWorld()->SpawnActor<ABlueOfficerBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
 
 	FTimerHandle UnusedHandle;
