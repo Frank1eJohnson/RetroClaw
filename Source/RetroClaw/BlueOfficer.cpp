@@ -206,8 +206,10 @@ void ABlueOfficer::StartGunAttack()
 void ABlueOfficer::FireBullet()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
-	if (BulletClass)
+	if (BulletClass && !isDead)
 	{
+		UGameplayStatics::SpawnSound2D(this, BulletSound, 1.0f, 1.0f, 0.0f);
+
 		FRotator SpawnRotation = GetSprite()->GetComponentRotation();
 		if (movementDirection < 0)
 			SpawnRotation.Yaw = 180;
@@ -322,6 +324,13 @@ void ABlueOfficer::OnOverlapEndGunFireCollisionBox(UPrimitiveComponent* Overlapp
 void ABlueOfficer::HandleDeath()
 {
 	isDead = true;
+
+	UGameplayStatics::SpawnSound2D(this, DeathSound, 1.0f, 1.0f, 0.0f);
+
+	if (ClawCelebrationSound != nullptr)
+	{
+		UGameplayStatics::SpawnSound2D(this, ClawCelebrationSound, 1.0f, 1.0f, 0.0f);
+	}
 
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABlueOfficer::DestroyOfficer, 0.6f, false);

@@ -8,6 +8,7 @@
 #include "ClawBullet.h"
 #include "Components/BoxComponent.h"
 #include "PaperSpriteActor.h"
+#include "Sound/SoundBase.h"
 #include "RetroClawCharacter.generated.h"
 
 class UTextRenderComponent;
@@ -134,6 +135,30 @@ protected:
 	bool isPistoling = false; 
 
 	float currentHealth = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ammo)
+	int32 ammo = 13;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* RightFootSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* LeftFootSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* pistolFiringSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* EmptyPistolSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* ClawSwordSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* ClawHurtSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* ClawDeathSound;
 
 public:
 	ARetroClawCharacter();

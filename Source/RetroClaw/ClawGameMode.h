@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Sound/SoundBase.h"
 #include "GameFramework/GameModeBase.h"
 #include "ClawGameMode.generated.h"
 
@@ -37,4 +38,8 @@ protected:
 	void GameStart();
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameOver(bool PlayerWon);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* LevelSound;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
 #include "HealthComponent.h"
+#include "Sound/SoundBase.h"
 #include "BlueOfficer.generated.h"
 
 
@@ -81,6 +82,15 @@ protected:
 	// 0 will result in no movement, 1 is right
 	// movement and -1 is left movement.
 	float movementDirection = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* BulletSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* DeathSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* ClawCelebrationSound;
 
 public:
 	ABlueOfficer();

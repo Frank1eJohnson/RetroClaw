@@ -40,6 +40,7 @@ void ATreasureObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 		// increase the score in the game mode.
 		GameModeRef->AddScore(TreasureObjectScore);
 
+		UGameplayStatics::SpawnSound2D(this, CollectedSound, 1.0f, 1.0f, 0.0f);
 		// TODO: create animation for the score object flying to the score.
 
 		// destroy actor.

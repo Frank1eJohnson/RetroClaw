@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperFlipbookActor.h"
+#include "Sound/SoundBase.h"
 #include "TreasureObject.generated.h"
 
 
@@ -33,4 +34,9 @@ private:
 	int64 TreasureObjectScore;
 
 	AClawGameMode* GameModeRef;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
+	USoundBase* CollectedSound;
 };

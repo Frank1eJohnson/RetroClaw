@@ -255,6 +255,13 @@ void AEnemyCharacter::HandleDeath()
 {
 	isDead = true; 
 
+	UGameplayStatics::SpawnSound2D(this, DeathSound, 1.0f, 1.0f, 0.0f);
+
+	if (ClawCelebrationSound != nullptr)
+	{
+		UGameplayStatics::SpawnSound2D(this, ClawCelebrationSound, 1.0f, 1.0f, 0.0f);
+	}
+
 	//TODO: Disable Enemy movement and make him fall  
 
 	FTimerHandle UnusedHandle;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
+#include "Sound/SoundBase.h"
 #include "BlueOfficerBullet.generated.h"
 
 /**

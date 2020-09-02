@@ -2,12 +2,14 @@
 
 
 #include "ClawGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void AClawGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGameplayStatics::SpawnSound2D(this, LevelSound, 1.0f, 1.0f, 0.0f);
 }
 
 

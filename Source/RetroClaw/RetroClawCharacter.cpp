@@ -158,6 +158,7 @@ void ARetroClawCharacter::Tick(float DeltaSeconds)
 	}
 
 	if (currentHealth != ClawHealth->GetHealth()) {
+		UGameplayStatics::SpawnSound2D(this, ClawHurtSound, 1.0f, 1.0f, 0.0f);
 		StartHurt();
 
 		currentHealth = ClawHealth->GetHealth();
@@ -221,6 +222,7 @@ void ARetroClawCharacter::StartSwording()
 	if (isSwording == false && isCrouching == false)
 	{
 		isSwording = true;
+		UGameplayStatics::SpawnSound2D(this, ClawSwordSound, 1.0f, 1.0f, 0.0f);
 
 		if (GetCharacterMovement()->IsFalling() == false)
 		{
@@ -306,17 +308,28 @@ void ARetroClawCharacter::SpawnBullet()
 	//UE_LOG(LogTemp, Warning, TEXT("pistoling"));
 	if (BulletClass)
 	{
-		FRotator SpawnRotation = GetActorRotation();
-		FVector SpawnLocation;
+		if (ammo > 0)
+		{
+			ammo--;
 
-		if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f);
-		else SpawnLocation = GetActorLocation() + FVector(-70.0, 0.0f, 25.0f);
+			UGameplayStatics::SpawnSound2D(this, pistolFiringSound, 1.0f, 1.0f, 0.0f);
 
-		if (GetCharacterMovement()->IsFalling() == true) {
-			SpawnLocation += FVector(0.0, 0.0f, -20.0f);
+			FRotator SpawnRotation = GetActorRotation();
+			FVector SpawnLocation;
+
+			if (GetActorRotation().Yaw >= 0) SpawnLocation = GetActorLocation() + FVector(70.0, 0.0f, 25.0f);
+			else SpawnLocation = GetActorLocation() + FVector(-70.0, 0.0f, 25.0f);
+
+			if (GetCharacterMovement()->IsFalling() == true) {
+				SpawnLocation += FVector(0.0, 0.0f, -20.0f);
+			}
+
+			GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
 		}
-
-		GetWorld()->SpawnActor<AClawBullet>(BulletClass, SpawnLocation, SpawnRotation);
+		else
+		{
+			UGameplayStatics::SpawnSound2D(this, EmptyPistolSound, 1.0f, 1.0f, 0.0f);
+		}
 	}
 
 	if (GetCharacterMovement()->IsFalling()) {
@@ -426,4 +439,6 @@ void ARetroClawCharacter::HandleDeath()
 
 	//TODO: Disable Claw movement and make him fall 
 	//SetActorLocation(ClawLocation + FVector(0.0f, 1.0f, 0.0f));
+
+	UGameplayStatics::SpawnSound2D(this, ClawDeathSound, 1.0f, 1.0f, 0.0f);
 }
