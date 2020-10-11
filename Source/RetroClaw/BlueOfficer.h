@@ -75,6 +75,7 @@ protected:
 	bool isBashingGun = false;
 	bool isDead = false;
 	bool isHurt = false;
+	bool isCrouching = false;
 
 	int patrols = 0;
 

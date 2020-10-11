@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Paper2D",
-				"Engine"
+				"Engine",
+				"UMG"
 			]
 		}
 	],

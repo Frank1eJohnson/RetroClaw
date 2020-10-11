@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
 #include "HealthComponent.h"
+#include "ClawGameMode.h"
 #include "ClawBullet.h"
 #include "Components/BoxComponent.h"
 #include "PaperSpriteActor.h"
@@ -41,9 +42,7 @@ class ARetroClawCharacter : public APaperCharacter
 	USceneComponent* BulletSpawnLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<APaperSpriteActor> BulletClass;
-
-	void FixAnimationChangeOffset(float offset, bool animationBegin);
+	TSubclassOf<APaperSpriteActor> BulletClass; 
 	
 protected:
 	// The animation to play while running around
@@ -114,14 +113,8 @@ protected:
 
 	void StartHurt();
 	void StopHurt();
-
+	virtual void BeginPlay() override;
 	void UpdateCharacter();
-
-	/** Handle touch inputs. */
-	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
-
-	/** Handle touch stop event. */
-	void TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -130,7 +123,6 @@ protected:
 	
 	bool isHurt = false;
 	bool isDead = false;
-	bool isCrouching = false;
 	bool isSwording = false; 
 	bool isPistoling = false; 
 
@@ -160,6 +152,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sounds)
 	USoundBase* ClawDeathSound;
 
+	UCapsuleComponent* clawCapsuleComponent;
+
 public:
 	ARetroClawCharacter();
 
@@ -172,9 +166,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Damage)
 	TSubclassOf<UDamageType> DamageType;
+	
+	AClawGameMode* GameModeRef;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UBoxComponent* attackCollisionBox;
 
-	void HandleDeath();
+	void HandleDeath(); 
+
+	bool isCrouching = false;
 };

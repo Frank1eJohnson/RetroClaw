@@ -65,8 +65,7 @@ void AEnemyCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	if (OtherActor && OtherComp->IsA(UCapsuleComponent::StaticClass()) && !isDead)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("overlapping"));
-		
-		AActor* MyOwner = GetOwner();
+
 		if (OtherActor && OtherActor != this && OtherActor->IsA(ARetroClawCharacter::StaticClass()))
 		{
 			ClawCharacter = OtherActor;
@@ -113,12 +112,12 @@ void AEnemyCharacter::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("beginplay"));
 
 	SetActorRotation(FRotator(0.0f, 180.0f, 0.0f));
-	StartMovementTimer();
+	StartMovement();
 }
 
 void AEnemyCharacter::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds); 
 
 	// the movementDirection will routinly be changed from 1 to -1
 	// so the enemy will always be moving either to left or to right
@@ -135,65 +134,50 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 		HandleDeath();
 	}
 	
-	UpdateCharacter();
+	UpdateAnimation();
 }
 
 
 // starts the timer for the swording animation
 void AEnemyCharacter::StartSwording()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("swording"));
+	//for animation
 	isSwording = true;
 
 	// swording animation takes 0.6 second
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopSwording, 0.6f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::DealDamage, 0.5f, false);
 
-	StartDamaging();
+	GetCharacterMovement()->DisableMovement(); 
+}
 
-	GetCharacterMovement()->DisableMovement();
-	//GetCharacterMovement()->StopMovementImmediately();
+// starts the timer for the swording animation
+void AEnemyCharacter::DealDamage()
+{
+	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
+	{ 
+		UGameplayStatics::ApplyDamage(ClawCharacter, 20, GetOwner()->GetInstigatorController(), this, DamageType);
+	} 
+
+	// swording animation takes 0.6 second
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopSwording, 0.1f, false); 
 }
 
 // called when the timer for the swording animation ends
 void AEnemyCharacter::StopSwording()
-{
-	//StopDamaging();
+{ 
+	// if he's still overlapping claw, then he keeps attacking.
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("overlapping"));
+	{ 
 		StartSwording();
 	} else {
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		isSwording = false;
 	}
-}
-
-// somehow this method gets called twice for a single hit.
-void AEnemyCharacter::StartDamaging()
-{
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StopDamaging, 0.5f, false);
-}
-
-void AEnemyCharacter::StopDamaging()
-{
-	// checks if enemy is overlapping claw
-	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("hit"));
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, "hitted claw"); 
-
-		UGameplayStatics::ApplyDamage(ClawCharacter, 20, GetOwner()->GetInstigatorController(), this, DamageType);
-	}
-	else {
-		//UE_LOG(LogTemp, Warning, TEXT("else"));
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "didn't hit claw");
-	}
 } 
 
-
-void AEnemyCharacter::StartMovementTimer()
+void AEnemyCharacter::StartMovement()
 {
 	//UE_LOG(LogTemp, Error, TEXT("started timer"));
 
@@ -210,18 +194,13 @@ void AEnemyCharacter::ChangeMovementDirection()
 
 	if (ClawCharacter != nullptr && attackCollisionBox->IsOverlappingActor(ClawCharacter))
 	{
-		StartMovementTimer();
+		StartMovement();
 		return;
 	}
 
-	if (movementDirection == 1.0f)
-		movementDirection = -1.0f;
-	else if (movementDirection == -1.0f)
-		movementDirection = 1.0f;
+	//if moving right reverse and vice versa
+	movementDirection *= -1.0f;
 	
-	//UE_LOG(LogTemp, Error, TEXT("ended timer"));
-
-
 	if (movementDirection < 0.0f)
 	{
 		SetActorRotation(FRotator(0.0f, 0.0f, 0.0f)); 
@@ -231,25 +210,8 @@ void AEnemyCharacter::ChangeMovementDirection()
 		SetActorRotation(FRotator(0.0f, 180.0f, 0.0f)); 
 	}
 	
-
-	//SetActorLocation(GetActorLocation() + FVector(-1.0f * movementDirection * 80.0f, 0.0f, 0.0f)); 
-
-	StartIdlenessTimer();
-}
-
-// don't know why but unreal enters crashloop without this 
-// function, so here it is.
-void AEnemyCharacter::StartIdlenessTimer()
-{
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyCharacter::StartMovementTimer, 0.5f, false);
-}
-
-void AEnemyCharacter::UpdateCharacter()
-{
-	// Update animation to match the motion
-	UpdateAnimation();
-}
+	StartMovement();
+}  
 
 void AEnemyCharacter::HandleDeath()
 {

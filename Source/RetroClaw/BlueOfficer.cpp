@@ -77,8 +77,14 @@ void ABlueOfficer::UpdateAnimation()
 		DesiredAnimation = HurtAnimation;
 	}
 	else if (isFiringGun) {
-		// if swording then render the sword animation.
-		DesiredAnimation = GunAttackAnimation;
+		if (isCrouching)
+		{
+			DesiredAnimation = CrouchingGunAttackAnimation;
+		} 
+		else
+		{
+			DesiredAnimation = GunAttackAnimation;
+		}
 	}
 	else if (isBashingGun) {
 		DesiredAnimation = GunBashAnimation;
@@ -132,7 +138,7 @@ void ABlueOfficer::StartMoving()
 	isWalking = true;
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABlueOfficer::ChangeMovementDirection, 3.2f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABlueOfficer::ChangeMovementDirection, 1.5f, false);
 }
 
 void ABlueOfficer::ChangeMovementDirection()
@@ -219,6 +225,8 @@ void ABlueOfficer::FireBullet()
 		if (GetActorRotation().Yaw < 0) SpawnLocation = GetActorLocation() + FVector(65.0, 0.0f, 35.0f);
 		else SpawnLocation = GetActorLocation() + FVector(-65.0, 0.0f, 35.0f);
 
+		if (isCrouching) SpawnLocation.Z -= 40.0f;
+
 		GetWorld()->SpawnActor<ABlueOfficerBullet>(BulletClass, SpawnLocation, SpawnRotation);
 	}
 
@@ -238,6 +246,18 @@ void ABlueOfficer::StopGunAttack()
 		}
 		else 
 		{
+			ARetroClawCharacter* clawCharacter;
+			clawCharacter = Cast<ARetroClawCharacter>(ClawCharacter);
+
+			if (clawCharacter->isCrouching)
+			{
+				isCrouching = true;
+			}
+			else
+			{
+				isCrouching = false;
+			}
+
 			StartGunAttack();
 		} 
 	}
@@ -278,6 +298,17 @@ void ABlueOfficer::StopGunBash()
 		}
 		else
 		{ 
+			ARetroClawCharacter* clawCharacter;
+			clawCharacter = Cast<ARetroClawCharacter>(ClawCharacter);
+
+			if (clawCharacter->isCrouching)
+			{
+				isCrouching = true;
+			}
+			else
+			{
+				isCrouching = false;
+			}
 			StartGunAttack();
 		}
 	}
@@ -311,6 +342,18 @@ void ABlueOfficer::OnOverlapBeginGunFireCollisionBox(UPrimitiveComponent* Overla
 				StartGunBash();
 			}
 			else {
+				ARetroClawCharacter* clawCharacter;
+				clawCharacter = Cast<ARetroClawCharacter>(OtherActor);
+
+				if (clawCharacter->isCrouching)
+				{
+					isCrouching = true;
+				} 
+				else 
+				{
+					isCrouching = false;
+				}
+
 				StartGunAttack();
 			} 
 		} 

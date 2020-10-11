@@ -21,6 +21,11 @@ float UHealthComponent::GetHealth()
 	return Health;
 }
 
+void UHealthComponent::SetHealth(float damage)
+{
+	Health = FMath::Clamp(Health - damage, 0.0f, DefaultHealth);
+}
+
 // Called when the game starts
 void UHealthComponent::BeginPlay()
 {

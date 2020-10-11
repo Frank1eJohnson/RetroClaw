@@ -37,19 +37,14 @@ protected:
 	class UPaperFlipbook* DeadAnimation;
 
 	/** Called to choose the correct animation to play based on the character's movement state */
-	void UpdateAnimation();
+	void UpdateAnimation(); 
 
-	void UpdateCharacter();
-
-	void StartMovementTimer();
+	void StartMovement();
 	void ChangeMovementDirection();
-	void StartIdlenessTimer();
 
 	void StartSwording();
-	void StopSwording();
-
-	void StartDamaging();
-	void StopDamaging();
+	void DealDamage();
+	void StopSwording(); 
 
 	bool isSwording = false;
 	bool isDead = false;

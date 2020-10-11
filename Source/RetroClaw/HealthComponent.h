@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ClawGameMode.h"
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
@@ -28,6 +29,7 @@ public:
 	UHealthComponent();
 
 	float GetHealth();
+	void SetHealth(float damage);
 
 protected:
 	// Called when the game starts

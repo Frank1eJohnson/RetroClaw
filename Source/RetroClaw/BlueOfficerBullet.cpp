@@ -51,7 +51,7 @@ void ABlueOfficerBullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, DamageType);
 
 		// destroy the bullet.
-		this->Destroy();
+		this->Destroy(); 
 	}
 }
 
