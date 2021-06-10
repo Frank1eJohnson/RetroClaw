@@ -1,5 +1,5 @@
 # RetroClaw
-Remaster of classic Captain Claw game using Unreal Engine 4.26.2 written in C++ and focusses on Object Oriented Design principles.
+Remaster of classic Captain Claw game using Unreal Engine 4.26.2 written in C++ and focuses on Object Oriented Design principles.
 
 ## Videos
 
